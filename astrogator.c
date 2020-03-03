@@ -35,7 +35,11 @@ main(int argc, char * argv[])
         printf("\nERROR: An invalid mode was selected. Try astrogator --help for usage information.");
         return ERROR_INVALIDMODE;
     }
+}
 
+void
+fix_position(void)
+{
     double position[3];
     double velocity[3];
     double tjd;
@@ -68,11 +72,4 @@ main(int argc, char * argv[])
     printf("\nEphemeris Return Code: %d", result);
 
     printf("\nMars Position: (%.6lf, %.6lf, %.6lf)", position[0], position[1], position[2]);
-
-}
-
-int
-fix_position(object body_a, object body_b, double tjd, double angle, double[3] position, double[3] velocity)
-{
-
 }

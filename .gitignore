@@ -52,7 +52,7 @@ Mkfile.old
 dkms.conf
 
 # Compiled binaries
-main
+astrogator
 
 # IDE Nonesense
 .vscode**

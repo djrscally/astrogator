@@ -17,7 +17,7 @@ int show_help(void);
 int show_version(void);
 
 // function prototypes for source
-int fix_position(object, object, double, double, double[3], double[3]);
+void fix_position(void);
 
 // helper functions for source file
 int
@@ -61,15 +61,13 @@ show_help(void)
 int
 show_version(void)
 {
-    printf("\n\
-        astrogator "VERSION" compiled "__DATE__"\n\
-        Copyright (C) 2020 Dan Scally\n\
-        License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n\
-        This is free software: you are free to change and redistribute it.\n\
-        There is NO WARRANTY, to the extent permitted by law.\n\
-        \n\
-        Written by Dan Scally.\
-    ");
+    printf("\nastrogator "VERSION" compiled "__DATE__"\n"
+            "Copyright (C) 2020 Dan Scally\n"
+            "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n"
+            "This is free software: you are free to change and redistribute it.\n"
+            "There is NO WARRANTY, to the extent permitted by law.\n"
+            "\n"
+            "Written by Dan Scally.\n");
 
     return 0;
 }

@@ -53,3 +53,6 @@ dkms.conf
 
 # Compiled binaries
 main
+
+# IDE Nonesense
+.vscode**

@@ -27,6 +27,8 @@ show_help(void)
     printf("Usage: astrogator --mode position <body [-g | body angle body body angle [body body angle...]]> [-dt yyyy-mm-dd hh:mm:ss] [-v]\n");
     printf("or   : astrogator --mode orbit <position position> [-dt yyyy-mm-dd hh:mm:ss] [-v]\n");
     printf("or   : astrogator --mode range body separation\n");
+    printf("or   : astrogator --help\n");
+    printf("or   : astrogator --version\n");
     printf("Position Mode Options:\n\
             -g              Get the known current position of a solar system body rather than calculate the position of a\
                             spacecraft.\

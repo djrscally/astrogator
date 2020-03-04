@@ -3,11 +3,9 @@
 install:
 	install astrogator /usr/bin
 
-# Link the custom object and novas library into the binary. Also do 
-# some cleanup of the intermediate *.o files.
+# Link the custom object and novas library into the binary.
 astrogator: astrogator.o libnovas.a
 	gcc -Wall -Wextra astrogator.o -L. -lnovas -lm -o astrogator
-	rm -f *.o
 
 # Object file for my code
 astrogator.o: astrogator.c astrogator.h

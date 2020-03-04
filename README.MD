@@ -16,7 +16,16 @@ Well...
 
 #### Installation
 
-Binary on github, or compile from source. Compilation should be as simple as `make`, `make install`
+Easy peasy:
+
+```
+$ cd /path/to/somewhere
+$ git clone https://github.com/djrscally/astrogator
+$ make astrogator
+$ sudo make install
+```
+
+A simple `astrogator --version` should verify the install.
 
 #### To-Do
 

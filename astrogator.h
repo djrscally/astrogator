@@ -8,9 +8,11 @@
 #endif
 
 // macros
-#define VERSION             "0.1.0"
+#define VERSION             "0.1.1"
+#define SUCCESS             0
 #define ERROR_NOARGS        1
 #define ERROR_INVALIDMODE   2
+#define ERROR_GETPOSITION   1000
 
 // function prototypes for header
 int show_help(void);
@@ -18,15 +20,20 @@ int show_version(void);
 
 // function prototypes for source
 void fix_position(void);
+int get_position(
+                // inputs
+                int, int, double, double *,
+                // outputs
+                double *);
 
 // helper functions for source file
 int
 show_help(void)
 {
     printf("astrogator v"VERSION" compiled "__DATE__"\n");
-    printf("Usage: astrogator --mode position <body [-g | body angle body body angle [body body angle...]]> [-dt yyyy-mm-dd hh:mm:ss] [-v]\n");
-    printf("or   : astrogator --mode orbit <position position> [-dt yyyy-mm-dd hh:mm:ss] [-v]\n");
-    printf("or   : astrogator --mode range body separation\n");
+    printf("Usage: astrogator position <body [-g | body angle body body angle [body body angle...]]> [-dt yyyy-mm-dd hh:mm:ss] [-v]\n");
+    printf("or   : astrogator orbit <position position> [-dt yyyy-mm-dd hh:mm:ss] [-v]\n");
+    printf("or   : astrogator range body separation\n");
     printf("or   : astrogator --help\n");
     printf("or   : astrogator --version\n");
     printf("Position Mode Options:\n\

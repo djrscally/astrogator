@@ -1,0 +1,26 @@
+# Link the custom object and novas library into the binary.
+astrogator.exe: astrogator.obj novas.obj eph_manager.obj novascon.obj solsys1.obj readeph0.obj nutation.obj
+    cl /Fe:.\astrogator.exe astrogator.obj novas.obj eph_manager.obj novascon.obj solsys1.obj readeph0.obj nutation.obj
+
+# Object file for my code
+astrogator.obj: astrogator.c astrogator.h
+	cl -Wall -c astrogator.c
+	
+# Objects for the NOVAS source code
+novas.obj: novas/novas.c novas/novas.h
+	cl -Wall -c novas/novas.c
+	
+eph_manager.obj: novas/eph_manager.c novas/eph_manager.h
+	cl -Wall -c novas/eph_manager.c 
+
+novascon.obj: novas/novascon.c novas/novascon.h
+	cl -Wall -c novas/novascon.c
+
+solsys1.obj: novas/solsys1.c novas/solarsystem.h
+	cl -Wall -c novas/solsys1.c
+	
+readeph0.obj: novas/readeph0.c
+	cl -Wall -c novas/readeph0.c
+
+nutation.obj: novas/nutation.c novas/nutation.h
+	cl -Wall -c novas/nutation.c

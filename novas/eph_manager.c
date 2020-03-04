@@ -607,7 +607,7 @@ short int planet_ephemeris (double tjd[2], short int target,
       position[i] = target_pos[i] - center_pos[i];
       velocity[i] = target_vel[i] - center_vel[i];
    }
-   
+
    return 0;
 }
 

@@ -2,10 +2,15 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <time.h>
+#include <unistd.h>
+
 #include "novas/solarsystem.h"
 #include "novas/novas.h"
 #include "novas/eph_manager.h"
 #include "astrogator.h"
+
+
 
 int
 main(int argc, char * argv[])
@@ -16,23 +21,55 @@ main(int argc, char * argv[])
         show_help();
         return ERROR_NOARGS;
     }
-    
-    int program_state;
 
-    if (!strcmp(argv[1], "position")) {
-        if (!strcmp(argv[2], "-g")) {
-            // We're in get known position of object mode
-            double tjd = julian_date(2020, 3, 2, 23);
+    // argument flags, with defaults
+    struct arg_flags af = {
+        'p',
+        0,
+        0,
+        1,
+        1,
+        0,
+        "2020030422",
+        0,
+        0,
+        0
+    };
 
-            // convert the inputs to actual integers
-            int type = *argv[3] - '0';
-            int number = *argv[4] - '0';
+    // parse the arguments into our various flags
+    parse_args(argc, argv, &af);
+
+    // break and exit if user asks for help or version info
+    if (af.help) {
+        show_help();
+        return SUCCESS;
+    } else if (af.version) {
+        show_version();
+        return SUCCESS;
+    }
+
+    if (af.mode == 'p') {
+        if (af.get_flag) {
+            // We're in get known position of object mode. First up, parse datetime into
+            // a julian date
+
+            double tjd;
+            // did we pass a specific datetime?
+            if (af.custom_dt) {
+                printf("Not implemented yet");
+                tjd = julian_date(2020, 3, 4, 23);
+            } else { // you presumably want the current position
+                time_t t = time(NULL);
+                struct tm tm = *localtime(&t);
+
+                tjd = julian_date(tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour);
+            }
 
             // output variables
             double position[3];
             double velocity[3];
 
-            int result = get_position(type, number, tjd, position, velocity);
+            int result = get_position(af.type, af.body1, tjd, position, velocity);
 
             if (!result) {
                 printf("position: (%.6lf, %.6lf, %.6lf), velocity: (%.6lf, %.6lf, %.6lf)\n",
@@ -46,20 +83,40 @@ main(int argc, char * argv[])
 
         }
         return SUCCESS;
-    } else if (!strcmp(argv[1], "orbit")) {
-        // We're fixing orbits
-    } else if (!strcmp(argv[1], "range")) {
-        // We're estimating range
-    } else if (!strcmp(argv[1], "--help")) {
-        show_help();
-        return 0;
-    } else if (!strcmp(argv[1], "--version")) {
-        program_state = show_version();
     }
-    else {
-        printf("\nERROR: An invalid mode was selected. Try astrogator --help for usage information.");
-        return ERROR_INVALIDMODE;
+}
+
+int
+parse_args(int argc, char * argv[], struct arg_flags * af)
+{
+    int c;
+
+    while ((c = getopt(argc, argv, "m:o:b:gt:vh")) != -1) {
+        switch (c) {
+            case 'm':
+                af->mode = *optarg;
+                break;
+            case 'g':
+                af->get_flag = 1;
+                break;
+            case 't':
+                af->type = atoi(optarg);
+                break;
+            case 'b':
+                af->body1 = atoi(optarg);
+                break;
+            case 'v':
+                af->version = 1;
+                break;
+            case 'h':
+                af->help = 1;
+                break;
+            case '?':
+                printf("INFO: Ignoring unrecognised option %c", (char) optopt);
+        }
     }
+
+    return 0;
 }
 
 int
@@ -95,7 +152,7 @@ get_position(int type, int number, double tjd, double position[3], double veloci
     short int den;
 
     // open the ephemeris
-    int ephem_status = ephem_open("novas/JPLEPH.421", &jdb, &jde, &den);
+    int ephem_status = ephem_open("novas/JPLEPH", &jdb, &jde, &den);
 
     if (ephem_status) {
         printf("ERROR: The Ephemeris could not be opened correctly.\n");

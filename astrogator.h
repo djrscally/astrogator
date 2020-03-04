@@ -14,6 +14,20 @@
 #define ERROR_INVALIDMODE   2
 #define ERROR_GETPOSITION   1000
 
+// structs
+struct arg_flags {
+    char mode;              // switch between position, orbit and range
+    int get_flag : 1;       // are we doing a lookup rather than a calculation
+    int type;         // the type of body we're looking at
+    int body1;         // the identifier of the body we're looking at
+    int body2;
+    int custom_dt : 1;      // use a custom datetime?
+    char dt[11];            // custom datetime. 11 chars to make room for \0
+    int origin;
+    int help;
+    int version;
+};
+
 // function prototypes for header
 int show_help(void);
 int show_version(void);
@@ -25,18 +39,15 @@ int get_position(
                 int, int, double, double *,
                 // outputs
                 double *);
+int parse_args(int, char **, struct arg_flags *);
 
 // helper functions for source file
 int
 show_help(void)
 {
     printf("astrogator v"VERSION" compiled "__DATE__"\n");
-    printf("Usage: astrogator position <body [-g | body angle body body angle [body body angle...]]> [-dt yyyy-mm-dd hh:mm:ss] [-v]\n");
-    printf("or   : astrogator orbit <position position> [-dt yyyy-mm-dd hh:mm:ss] [-v]\n");
-    printf("or   : astrogator range body separation\n");
-    printf("or   : astrogator --help\n");
-    printf("or   : astrogator --version\n");
-    printf("Position Mode Options:\n\
+    printf("Usage: astrogator [-h -v] -m <p | o | r> [-g] [-t type] [-o origin] body1 [angle body2 angle]\n");
+    printf("Options:\n\
             -g              Get the known current position of a solar system body rather than calculate the position of a\
                             spacecraft.\
             -dt             Specify a datetime to use in calculating positions. Absent this option, the program will default\
@@ -68,7 +79,7 @@ show_help(void)
 int
 show_version(void)
 {
-    printf("\nastrogator "VERSION" compiled "__DATE__"\n"
+    printf("astrogator "VERSION" compiled "__DATE__"\n"
             "Copyright (C) 2020 Dan Scally\n"
             "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n"
             "This is free software: you are free to change and redistribute it.\n"

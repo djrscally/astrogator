@@ -4,49 +4,37 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <argp.h>
 
 #include "novas/solarsystem.h"
 #include "novas/novas.h"
 #include "novas/eph_manager.h"
 #include "astrogator.h"
 
+struct argp_option options[] = {
+    {"mode", 'm', "MODE", 0, "Switch program into position/orbit/range mode."},
+    {"get", 'g', "BODY", 0, "Get data for the specified natural body rather than the user's spacecraft."},
+    {"datetime", 'd', "DATETIME", 0, "Use specified datetime (in format YYYY-m-d-HH)"},
+    {"position", 999, 0, 0, "Shorthand for --mode=position"},
+    {"orbit", 888, 0, 0, "Shorthand for --mode=orbit"},
+    {"range", 777, 0, 0, "Shorthand for --mode=range"},
+    { 0 }
+};
 
+struct argp argp = {
+    options,
+    parse_args,
+    "-m p -g BODY\n-m p ORIGIN BODY1 ANGLE1 BODY2 ANGLE2\n-m o -g BODY\n-m o POSITION POSITION\n-m r BODY ANGLE",
+    "\nObtain astronomical navigation data.\vSee https://github.com/djrscally/astrogator for full user guide. Positional data drawn from JPL's ephemerides."
+};
 
 int
 main(int argc, char * argv[])
 {
-
-    // if no arguments are entered, print the help.
-    if (argc == 1) {
-        show_help();
-        return ERROR_NOARGS;
-    }
-
-    // argument flags, with defaults
-    struct arg_flags af = {
-        'p',
-        0,
-        0,
-        1,
-        1,
-        0,
-        "2020030422",
-        0,
-        0,
-        0
-    };
+    struct arg_flags af;
 
     // parse the arguments into our various flags
-    parse_args(argc, argv, &af);
-
-    // break and exit if user asks for help or version info
-    if (af.help) {
-        show_help();
-        return SUCCESS;
-    } else if (af.version) {
-        show_version();
-        return SUCCESS;
-    }
+    argp_parse(&argp, argc, argv, 0, 0, &af);
 
     if (af.mode == 'p') {
         if (af.get_flag) {
@@ -56,8 +44,8 @@ main(int argc, char * argv[])
             double tjd;
             // did we pass a specific datetime?
             if (af.custom_dt) {
-                printf("Not implemented yet");
-                tjd = julian_date(2020, 3, 4, 23);
+                tjd = julian_date(af.dt_year, af.dt_month, af.dt_day, af.dt_hour);
+                printf("%.6lf", tjd);
             } else { // you presumably want the current position
                 time_t t = time(NULL);
                 struct tm tm = *localtime(&t);
@@ -84,39 +72,6 @@ main(int argc, char * argv[])
         }
         return SUCCESS;
     }
-}
-
-int
-parse_args(int argc, char * argv[], struct arg_flags * af)
-{
-    int c;
-
-    while ((c = getopt(argc, argv, "m:o:b:gt:vh")) != -1) {
-        switch (c) {
-            case 'm':
-                af->mode = *optarg;
-                break;
-            case 'g':
-                af->get_flag = 1;
-                break;
-            case 't':
-                af->type = atoi(optarg);
-                break;
-            case 'b':
-                af->body1 = atoi(optarg);
-                break;
-            case 'v':
-                af->version = 1;
-                break;
-            case 'h':
-                af->help = 1;
-                break;
-            case '?':
-                printf("INFO: Ignoring unrecognised option %c", (char) optopt);
-        }
-    }
-
-    return 0;
 }
 
 int

@@ -7,6 +7,10 @@
     #include "novas/novas.h"
 #endif
 
+#ifndef __ARGP__
+    #include <argp.h>
+#endif
+
 // macros
 #define VERSION             "0.1.1"
 #define SUCCESS             0
@@ -22,15 +26,23 @@ struct arg_flags {
     int body1;         // the identifier of the body we're looking at
     int body2;
     int custom_dt : 1;      // use a custom datetime?
-    char dt[11];            // custom datetime. 11 chars to make room for \0
+    int dt_year;
+    int dt_month;
+    int dt_day;
+    int dt_hour;
     int origin;
-    int help;
-    int version;
 };
 
-// function prototypes for header
-int show_help(void);
-int show_version(void);
+// constants
+const char * argp_program_bug_address = "https://github.com/djrscally/astrogator/issues";
+const char * argp_program_version = "\n"
+                                    "astrogator "VERSION" compiled "__DATE__"\n"
+                                    "Copyright (C) 2020 Dan Scally\n"
+                                    "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n"
+                                    "This is free software: you are free to change and redistribute it.\n"
+                                    "There is NO WARRANTY, to the extent permitted by law.\n"
+                                    "\n"
+                                    "Written by Dan Scally.\n";
 
 // function prototypes for source
 void fix_position(void);
@@ -39,53 +51,66 @@ int get_position(
                 int, int, double, double *,
                 // outputs
                 double *);
-int parse_args(int, char **, struct arg_flags *);
+int parse_args(int, char *, struct argp_state *);
+int parse_dt(char *, struct arg_flags *);
 
-// helper functions for source file
 int
-show_help(void)
+parse_args(int key, char * arg, struct argp_state * state)
 {
-    printf("astrogator v"VERSION" compiled "__DATE__"\n");
-    printf("Usage: astrogator [-h -v] -m <p | o | r> [-g] [-t type] [-o origin] body1 [angle body2 angle]\n");
-    printf("Options:\n\
-            -g              Get the known current position of a solar system body rather than calculate the position of a\
-                            spacecraft.\
-            -dt             Specify a datetime to use in calculating positions. Absent this option, the program will default\
-                            to using the current datetime.\
-            Orbit Mode Options:\n\
-            -v              Verbose\n\
-            -sigs           Show signatures calculated based on first 32k for each file\n\
-            -rdonly         Apply to readonly files also (as opposed to skipping them)\n\
-            -ref <filepat>  Following file pattern are files that are for reference, NOT\n\
-                            to be eliminated, only used to check duplicates against\n\
-            -z              Do not skip zero length files (zero length files are ignored\n\
-                            by default)\n\
-            -u              Do not print a warning for files that cannot be read\n\
-            -p              Hide progress indicator (useful when redirecting to a file)\n\
-            -j              Follow NTFS junctions and reparse points (off by default)\n\
-            -listlink       hardlink list mode.  Not valid with -del, -bat, -hardlink,\n\
-                            or -rdonly, options\n\
-            filepat         Pattern for files.  Examples:\n\
-                             c:\\**        Match everything on drive C\n\
-                             c:\\**\\*.jpg  Match only .jpg files on drive C\n\
-                             **\\foo\\**    Match any path with component foo\n\
-                                           from current directory down\n\
-           \n\
-           ");
+    struct arg_flags * af = state->input;
+
+    switch(key) {
+        case 'm':
+            af->mode=*arg;
+            break;
+        case 'g':
+            af->get_flag = 1;
+            break;
+        case 'd':
+            af->custom_dt = 1;
+
+            if (parse_dt(arg, af)) {
+                argp_failure(state, 1, 0, "Invalid datetime entered");
+            }
+        case ARGP_KEY_END:
+            break;
+    }
 
     return 0;
 }
 
 int
-show_version(void)
+parse_dt(char * dt, struct arg_flags * af)
 {
-    printf("astrogator "VERSION" compiled "__DATE__"\n"
-            "Copyright (C) 2020 Dan Scally\n"
-            "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n"
-            "This is free software: you are free to change and redistribute it.\n"
-            "There is NO WARRANTY, to the extent permitted by law.\n"
-            "\n"
-            "Written by Dan Scally.\n");
+    char * c;
+    int i=0;
 
-    return 0;
+    for (i=0;i<4;i++) {
+        c = strtok(i==0 ? dt : NULL, "-");
+        if (c==NULL) {
+            break;
+        }
+        switch (i) {
+            case 0:
+                af->dt_year = atoi(c);
+                break;
+            case 1:
+                af->dt_month = atoi(c);
+                break;
+            case 2:
+                af->dt_day = atoi(c);
+                break;
+            case 3:
+                af->dt_hour = atoi(c);
+                break;
+            default:
+                return 1;
+        }
+    }
+
+    if (i == 4) {
+        return 0;
+    } else {
+        return 1; // not enough elements entered
+    }
 }

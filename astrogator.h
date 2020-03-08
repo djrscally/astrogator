@@ -31,6 +31,8 @@ struct arg_flags {
     int dt_day;
     int dt_hour;
     int origin;
+    char * argz;
+    size_t argz_len;
 };
 
 // constants
@@ -64,6 +66,8 @@ parse_args(int key, char * arg, struct argp_state * state)
             break;
         case 'g':
             af->get_flag = 1;
+            af->type=0;
+            af->body1=atoi(arg);
             break;
         case 'd':
             af->custom_dt = 1;
@@ -71,7 +75,23 @@ parse_args(int key, char * arg, struct argp_state * state)
             if (parse_dt(arg, af)) {
                 argp_failure(state, 1, 0, "Invalid datetime entered");
             }
+        case 999:
+            af->mode='p';
+            break;
+        case 888:
+            af->mode='o';
+            break;
+        case 777:
+            af->mode='r';
+            break;
+        case ARGP_KEY_ARG:
+            printf("Arg encountered");
+            af->type = 0;
+            printf("%c", *arg);
+            af->body1 = atoi(*arg);
+            break;
         case ARGP_KEY_END:
+            // do some argument processing here depending on the mode we're in
             break;
     }
 

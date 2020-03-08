@@ -3,8 +3,8 @@
 #include <math.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
 #include <argp.h>
+#include <argz.h>
 
 #include "novas/solarsystem.h"
 #include "novas/novas.h"

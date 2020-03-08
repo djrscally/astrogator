@@ -11,6 +11,10 @@
     #include <argp.h>
 #endif
 
+#ifndef __STRING__
+    #include <string.h>
+#endif
+
 // macros
 #define VERSION             "0.1.1"
 #define SUCCESS             0
@@ -45,6 +49,9 @@ const char * argp_program_version = "astrogator "VERSION" compiled "__DATE__"\n"
                                     "\n"
                                     "Written by Dan Scally.";
 
+// function prototypes for header
+int get_body_number(char *);
+
 // function prototypes for source
 void fix_position(void);
 int get_position(
@@ -67,7 +74,18 @@ parse_args(int key, char * arg, struct argp_state * state)
         case 'g':
             af->get_flag = 1;
             af->type=0;
-            af->body1=atoi(arg);
+
+            if (isdigit(*arg)) {
+                af->body1=atoi(arg);
+            } else {
+                int body = get_body_number(arg);
+                if (body) {
+                    af->body1=body;
+                } else {
+                    argp_failure(state, 1, 0, "An invalid body name was entered");
+                }
+            }
+            
             break;
         case 'd':
             af->custom_dt = 1;
@@ -132,4 +150,23 @@ parse_dt(char * dt, struct arg_flags * af)
     } else {
         return 1; // not enough elements entered
     }
+}
+
+int
+get_body_number(char * body_name)
+{
+    char * bodies[11] = {
+        "mercury", "venus", "earth","mars", "jupiter", "saturn", "uranus", "neptune", "pluto", "sun", "moon"
+        };
+
+    int i;
+
+    for (i=0;i<11;i++) {
+        if (!strcmp(body_name, bodies[i])) {
+            return i+1;
+        }
+    }
+
+    // body name not matched.
+    return 0;
 }

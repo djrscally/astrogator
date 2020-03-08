@@ -5,6 +5,7 @@
 #include <time.h>
 #include <argp.h>
 #include <argz.h>
+#include <ctype.h>
 
 #include "novas/solarsystem.h"
 #include "novas/novas.h"

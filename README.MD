@@ -73,6 +73,31 @@ data drawn from JPL's ephemerides.
 
 Report bugs to https://github.com/djrscally/astrogator/issues.
 ```
+
+### How's this actually work?
+
+For getting known positions of natural bodies; lookup the appropriate values in the ephemeris. 
+
+For everything else, it's a bit more complicated. 
+
+#### Fixing the spacecraft's position
+
+This is some fancy geometry, basically. We measure the angles between an _origin_ and two other solar system bodies. For argument's sake, let's call them the Sun, plus Venus and the Earth. Let's first consider the Spacecraft -> Sun -> Venus fix. The three points give us a triangle, of which we know one angle (because we measured it) and one side (the Sun -> Venus side, because the ephemeris tells us what that is).
+
+_pic goes here_
+
+We can't solve that triangle with what we have; insufficient data. Instead, we're going to construct the circle that touches all three of the points in question (meaning, we're going to calculate the centre of that circle and its radius). The first step to do so is to build a new triangle, with the point corresponding to the spacecraft moved to the (currently unknown) centre of the circle. This is a valid transformation because an [inscribed angle](https://en.wikipedia.org/wiki/Inscribed_angle) is twice the central angle that subtends the same arc on the circle - because we measured the Sun -> Venus angle we know that the angle of that triangle with the point moved to the circle's centre is double whatever our measurement was:
+
+_next pic_
+
+At this point, we split the Sun -> Venus line in two perpendicularly; remember that we know how long that line is and so we know where to split it. This splits our new triangle into two right angle triangles:
+
+_final pic_
+
+And from here, it's reasonably easy trigonometry. The tan of an angle is the length of the opposite side over the length of the adjacent side, i.e. - we know the angle A and the length of the opposite side, and so we can rearrange the equation to calculate the length of the adjecent side. This tells us exactly where the centre of the circle is. Next, the sin of an angle is the length of the opposite side over the hypotenuse (which is, in this case, the radius of the circle). Rearranging that gives us XYZ to get the hypotenuse, and so we know the circle's radius too.
+
+The operation is identical on whichever other body was selected, and the penultimate stage is to have two known circles, with two intersections. The first intersection will be at our _origin_ - in this case the sun. The second will be at the _spacecraft_, which is what we want to know!
+
 ### Acknowledgements
 
 ### Jet Propulsion Laboratory's Ephemeris

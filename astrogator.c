@@ -145,41 +145,25 @@ get_position(int type, int number, double tjd, double position[3], double veloci
     return 0;
 }
 
-void
-fix_position(void)
+int
+fix_position(double tjd, int origin, int body1, double angle1, int body2, double angle2, double position[3])
 {
-    double position[3];
-    double velocity[3];
-    double tjd;
+/*
+    fix_position returns the XYZ coordinates of the observer, by using the inputs to 
+    geometrically fix the position.
 
-    cat_entry * cat = (cat_entry *) malloc(sizeof(cat_entry));
-    make_cat_entry ("DUMMY","xxx",0,0.0,0.0,0.0,0.0,0.0,0.0,cat);
-    
-    tjd = julian_date(2020, 3, 2, 23);
-    printf("\nTJF: %.6lf", tjd);
+        Input Params
+            tjd             = julian date of the fix
+            origin          = object number
+                                calculation will assume the two angles relate to the angles
+                                between the two bodies and the origin
+            body1/2         = object number
+            angle1/2        = angle in degrees between origin and body1/2
 
-    double tjd_arr[2] = {tjd, 0};
+        Output Params
+            position[3]     = [X,Y,Z] coordinates of the observer.
 
-    object mars = {0, 4, "Mars", *cat};
-    int result;
+*/
 
-    // outs for ephem_open
-    double jdb;
-    double jde;
-    short int den;
-
-    /* open the ephemeris */
-    int eph_status = ephem_open("novas/JPLEPH.421", &jdb, &jde, &den);
-    printf("\n Eph Status: %d", eph_status);
-    printf("\nJDB: %.2lf, JDE: %.2lf, DE Num: %d", jdb, jde, den);
-
-    result = ephemeris(tjd_arr, &mars, 0,0, position, velocity);
-
-    ephem_close();
-
-    printf("\nEphemeris Return Code: %d", result);
-
-    printf("\nMars Position: (%.6lf, %.6lf, %.6lf)", position[0], position[1], position[2]);
-
-    free(cat);
+    return 0; // because I'm a placeholder!
 }

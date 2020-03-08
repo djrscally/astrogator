@@ -53,12 +53,16 @@ const char * argp_program_version = "astrogator "VERSION" compiled "__DATE__"\n"
 int get_body_number(char *);
 
 // function prototypes for source
-void fix_position(void);
+int fix_position(
+                // inputs
+                double, int, int, double, int, double,
+                // output
+                double *);
 int get_position(
                 // inputs
-                int, int, double, double *,
+                int, int, double,
                 // outputs
-                double *);
+                double *, double *);
 int parse_args(int, char *, struct argp_state *);
 int parse_dt(char *, struct arg_flags *);
 

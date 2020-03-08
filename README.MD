@@ -1,6 +1,15 @@
 # Astrogator
 ## A program for obtaining positional fixes and determining orbital parameters within the Solar System, using a sextant.
 
+### Contents
+
+1. Err, what?
+2. How to check this isn't BS
+3. Installation
+4. User Guide
+5. Methodology
+6. Acknowledgements
+
 ### Err, what?
 
 I know, I know. Probably useless right? But it's a fun project that I've been wanting to do for a while, gives me an excuse to learn to use C and also builds groundwork for a much more useful project I'm planning in the future.

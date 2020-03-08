@@ -73,13 +73,13 @@ parse_args(int key, char * arg, struct argp_state * state)
 
     switch(key) {
         case 'm':
-            af->mode=*arg;
+            af->mode=arg[0];
             break;
         case 'g':
             af->get_flag = 1;
             af->type=0;
 
-            if (isdigit(*arg)) {
+            if (isdigit(arg[0])) {
                 af->body1=atoi(arg);
             } else {
                 int body = get_body_number(arg);
@@ -110,7 +110,7 @@ parse_args(int key, char * arg, struct argp_state * state)
             printf("Arg encountered");
             af->type = 0;
             printf("%c", *arg);
-            af->body1 = atoi(*arg);
+            af->body1 = atoi(arg);
             break;
         case ARGP_KEY_END:
             // do some argument processing here depending on the mode we're in

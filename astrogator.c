@@ -32,7 +32,21 @@ struct argp argp = {
 int
 main(int argc, char * argv[])
 {
-    struct arg_flags af;
+    struct arg_flags af = {
+        'p'
+        , 0
+        , 0
+        , 3
+        , 0
+        , 0
+        , 2020
+        , 3
+        , 7
+        , 23
+        , 10
+        , NULL
+        , 0
+    };
 
     // parse the arguments into our various flags
     argp_parse(&argp, argc, argv, 0, 0, &af);
@@ -70,6 +84,45 @@ main(int argc, char * argv[])
                 return result;
             }
 
+        }
+        else {
+            /*     
+            line distance is sqrt((x2 - x1)^2 + (y2 - y1)^2)
+            */
+           
+            printf("started");
+            
+            double tjd;
+            int origin = 10; // sun
+            int body = 2; // venus
+            double angle = 30.0;
+            time_t t = time(NULL);
+            struct tm tm = *localtime(&t);
+            
+            tjd = julian_date(tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour);
+            
+            // step 1, get positions of sun and venus
+            double sun_pos[3];
+            double sun_vel[3];
+            get_position(0, origin, tjd, sun_pos, sun_vel);
+            printf("Sun: (%.6lf, %.6lf, %.6lf)\n", sun_pos[0], sun_pos[1], sun_pos[2]);
+
+            double venus_pos[3];
+            double venus_vel[3];
+
+            get_position(0, origin, tjd, venus_pos, venus_vel);
+            printf("Venus: (%.6lf, %.6lf, %.6lf)\n", venus_pos[0], venus_pos[1], venus_pos[2]);
+            /*
+            // step 2. Calculate the length of origin-body
+            double ob;
+
+            ob = sqrt(pow(venus_pos[0] - sun_pos[0], venus_pos[0] - sun_pos[0]) + pow(venus_pos[1] - sun_pos[1], venus_pos[1] - sun_pos[1]));
+
+            // bifurcated length
+            double bob = ob / 2;
+
+            printf("got to here ok");
+           */
         }
         return SUCCESS;
     }

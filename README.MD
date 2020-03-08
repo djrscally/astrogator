@@ -103,7 +103,7 @@ At this point, we split the Sun -> Venus line in two perpendicularly; remember t
 
 _final pic_
 
-And from here, it's reasonably easy trigonometry. The tan of an angle is the length of the opposite side over the length of the adjacent side, i.e. - we know the angle A and the length of the opposite side, and so we can rearrange the equation to calculate the length of the adjecent side. This tells us exactly where the centre of the circle is. Next, the sin of an angle is the length of the opposite side over the hypotenuse (which is, in this case, the radius of the circle). Rearranging that gives us XYZ to get the hypotenuse, and so we know the circle's radius too.
+And from here, it's reasonably easy trigonometry. The tan of an angle is the length of the opposite side over the length of the adjacent side, i.e. $${\tan \theta = O \divide A}$$   - we know the angle A and the length of the opposite side, and so we can rearrange the equation to calculate the length of the adjecent side. This tells us exactly where the centre of the circle is. Next, the sin of an angle is the length of the opposite side over the hypotenuse (which is, in this case, the radius of the circle). Rearranging that gives us XYZ to get the hypotenuse, and so we know the circle's radius too.
 
 The operation is identical on whichever other body was selected, and the penultimate stage is to have two known circles, with two intersections. The first intersection will be at our _origin_ - in this case the sun. The second will be at the _spacecraft_, which is what we want to know!
 

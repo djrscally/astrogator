@@ -109,6 +109,16 @@ The operation is identical on whichever other body was selected, and the penulti
 
 ![It almost looks like we're getting close to what we want to know now!][step-4]
 
+**But there are 2 possible triangles you could construct from measuring $\alpha$!!**
+
+Yeah, like this: 
+
+![Not so straightforward after all][step-5]
+
+This complicates things, because it means that there are two possible circles for each planet, leading to 4 possible intersections - one of which is still the Sun but any of the other 3 _could_ be the spacecraft. 
+
+Fortunately, we can narrow down the options by finding the range of the spacecraft to each planet. We'll discuss how that works later, but once you add the range information it's easy to see which intersection is right. For that reason, I'm pretending the problem doesn't exist during this explanation.
+
 ### Acknowledgements
 
 ### Jet Propulsion Laboratory's Ephemeris
@@ -128,3 +138,4 @@ No link because they're currently renovating their website. I'll try to remember
 [step-2]: docs/images/step2.png
 [step-3]: docs/images/step3.png
 [step-4]: docs/images/step4.png
+[step-5]: docs/images/step5.png

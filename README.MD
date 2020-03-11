@@ -93,19 +93,21 @@ For everything else, it's a bit more complicated.
 
 This is some fancy geometry, basically. We measure the angles between an _origin_ and two other solar system bodies. For argument's sake, let's call them the Sun, plus Venus and the Earth. Let's first consider the Spacecraft -> Sun -> Venus fix. The three points give us a triangle, of which we know one angle (because we measured it) and one side (the Sun -> Venus side, because the ephemeris tells us what that is).
 
-_pic goes here_
+![We know the length of line A and the value of angle alpha][step-1]
 
 We can't solve that triangle with what we have; insufficient data. Instead, we're going to construct the circle that touches all three of the points in question (meaning, we're going to calculate the centre of that circle and its radius). The first step to do so is to build a new triangle, with the point corresponding to the spacecraft moved to the (currently unknown) centre of the circle. This is a valid transformation because an [inscribed angle](https://en.wikipedia.org/wiki/Inscribed_angle) is twice the central angle that subtends the same arc on the circle - because we measured the Sun -> Venus angle we know that the angle of that triangle with the point moved to the circle's centre is double whatever our measurement was:
 
-_next pic_
+![The inscribed angle is half the central angle that subtends the same arc][step-2]
 
 At this point, we split the Sun -> Venus line in two perpendicularly; remember that we know how long that line is and so we know where to split it. This splits our new triangle into two right angle triangles:
 
-_final pic_
+![Nearly there, just some trigonometry to go][step-3]
 
-And from here, it's reasonably easy trigonometry. The tan of an angle is the length of the opposite side over the length of the adjacent side, i.e. $${\tan \theta = O \divide A}$$   - we know the angle A and the length of the opposite side, and so we can rearrange the equation to calculate the length of the adjecent side. This tells us exactly where the centre of the circle is. Next, the sin of an angle is the length of the opposite side over the hypotenuse (which is, in this case, the radius of the circle). Rearranging that gives us XYZ to get the hypotenuse, and so we know the circle's radius too.
+And from here, it's reasonably easy trigonometry. We need to find the angle $\beta$, and the length of the Venus-centre line; that will give us the location of the centre and the radius of the circle (since we can add that vector to the known position of Venus). $\beta$ is straightforward; angles in a triangle sum to 180 degrees, so $\beta=180-(90+\alpha)$. Next, the sin of an angle is the length of the opposite side over the hypotenuse. In our case, the hypotenuse is the Venus-centre line, and the side opposite $\alpha$ is half of the Sun-Venus line (which is known). We can therefore rearrange that equation to $hypotenuse={0.5A\over{\sin\alpha}}$. Now that we have the length of the Venus-Centre line and angle $\beta$ we can plot the circle exactly.
 
 The operation is identical on whichever other body was selected, and the penultimate stage is to have two known circles, with two intersections. The first intersection will be at our _origin_ - in this case the sun. The second will be at the _spacecraft_, which is what we want to know!
+
+![It almost looks like we're getting close to what we want to know now!][step-4]
 
 ### Acknowledgements
 
@@ -121,3 +123,8 @@ No link because they're currently renovating their website. I'll try to remember
 2. Expand fixes to 3D
 3. Calculate Orbital Parameters from fixes
 4. Additionally allow distance estimation from angular separation of each limb of a planet.
+
+[step-1]: docs/images/step1.png
+[step-2]: docs/images/step2.png
+[step-3]: docs/images/step3.png
+[step-4]: docs/images/step4.png

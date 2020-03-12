@@ -127,7 +127,7 @@ Let's say we're looking at Mars. We [know](https://nssdc.gsfc.nasa.gov/planetary
 
 ![Trigonometry is actually pretty useful. Sort of...][range]
 
-So we're going to use $\tan\alpha={opposite\over{adjacent}}$, rearranging it to ${adjacent={opposite\over{\tan\alpha}}}$ alpha is the angular separation we measured, and opposite is half the diameter of the planet. Easy.
+So we're going to use $\tan\alpha={opposite\over{adjacent}}$, rearranging it to ${adjacent={opposite\over{\tan\alpha}}}$ alpha is half of the angular separation we measured, and opposite is half the diameter of the planet. Easy.
 
 ### Acknowledgements
 

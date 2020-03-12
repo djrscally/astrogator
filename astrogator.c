@@ -1,10 +1,11 @@
+#include "getopt.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
 #include <time.h>
-#include <argp.h>
-#include <argz.h>
+#include "argp.h"
+//#include <argz.h>
 #include <ctype.h>
 
 #include "novas/solarsystem.h"
@@ -46,6 +47,7 @@ main(int argc, char * argv[])
         , 10
         , NULL
         , 0
+        , 1
     };
 
     // parse the arguments into our various flags
@@ -80,7 +82,7 @@ main(int argc, char * argv[])
                     velocity[0], velocity[1], velocity[2]
                 );
             } else {
-                printf("get_position returned %d\n", result);
+                fprintf(stderr, "get_position returned %d\n", result);
                 return result;
             }
 
@@ -125,7 +127,55 @@ main(int argc, char * argv[])
            */
         }
         return SUCCESS;
+    } else if (af.mode == 'r') {
+        if (af.get_flag) {
+            fprintf(stdout, "Not implemented yet");
+        } else {
+            fprintf("Enter the angular separation of the limbs of the planet in degrees: ");
+            double sep;
+            fscanf(stdin, "%d", &sep);
+            double range;
+            get_range(af.body1, sep, &range);
+            fprintf(stdout, "Range to body: %.6lfkm", range);
+        }
     }
+}
+
+int get_range(int number, double sep, double * range)
+/*
+    get_range returns the range to the specified body in km by using the measured angular separation
+    of the limbs of the body and the known diameter to do some trigonometry.
+
+    Input Params
+        number              = object number
+                                Mercury = 1, ..., Pluto = 9,
+                                    Sun = 10, Moon = 11
+        sep                 = angular separation of the limbs of the object. I.E.
+                              how wide does it look from where you are?
+
+    Output Params
+        range               = the range from the observer to the object in km.
+
+    Return Values
+        0                   = all is well
+        10+                 = something went wrong with get_diameter
+*/
+{
+    // first, get the diameter of the planet in km
+    double diameter;
+    int status = get_diameter(number, &diameter);
+    if (status) {
+        fprintf(stderr, "An error occurred when fetching the diameter of the planet");
+        return 10 + status;
+    }
+
+    // tan of an angle is adjacent over opposite. therefore by extension
+    // adjacent = opposite / tanA. The opposite is half the diameter of the planet, 
+    // and A is half the observed angular separation
+
+    *range = (0.5*diameter) / (tan(sep))
+
+    return 0;
 }
 
 int
@@ -219,4 +269,71 @@ fix_position(double tjd, int origin, int body1, double angle1, int body2, double
 */
 
     return 0; // because I'm a placeholder!
+}
+
+double
+get_diameter(int body, int * diameter)
+/*
+    get diameter just returns the diameter of the solar system body that's passed in
+
+        Input Params
+            body            = object number
+
+        Output Params
+            diameter        = the diameter in km of the body in question
+
+        Return Valuse
+            0               = Success!
+            1               = That body doesn't exist you numpty.
+*/
+
+{
+    switch body {
+        case 1:
+            // mercury
+            *diameter=4879;
+            break;
+        case 2:
+            // venus
+            *diameter=12104;
+            break;
+        case 3:
+            // earth
+            *diameter=12756;
+            break;
+        case 4:
+            // mars
+            *diameter=6792;
+            break;
+        case 5:
+            // jupiter
+            *diameter=142984;
+            break;
+        case 6:
+            // saturn
+            *diameter=120536;
+            break;
+        case 7:
+            // uranus
+            *diameter=51118;
+            break;
+        case 8:
+            // neptune
+            *diameter=49528;
+            break;
+        case 9:
+            // pluto
+            *diameter=2370;
+            break;
+        case 10:
+            // sol
+
+        case 11:
+            // luna
+            *diameter=3475;
+            break;
+        default:
+            return 1;
+    }
+    return 0;
 }

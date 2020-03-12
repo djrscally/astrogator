@@ -56,3 +56,9 @@ astrogator
 
 # IDE Nonesense
 .vscode**
+
+# Files I have to include to make windows
+# compile
+argp.h
+getopt.c
+getopt.h

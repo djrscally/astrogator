@@ -119,6 +119,16 @@ This complicates things, because it means that there are two possible circles fo
 
 Fortunately, we can narrow down the options by finding the range of the spacecraft to each planet. We'll discuss how that works later, but once you add the range information it's easy to see which intersection is right. For that reason, I'm pretending the problem doesn't exist during this explanation.
 
+#### Finding the Spacecraft's range to a body
+
+More trigonometry! Well, you might also use a laser or radar rangefinder. Whatever floats your boat; I'm using trigonometry. 
+
+Let's say we're looking at Mars. We [know](https://nssdc.gsfc.nasa.gov/planetary/factsheet/) that the diameter of Mars is 6792km. To find out range to the planet, we measure the [_angular separation_](https://en.wikipedia.org/wiki/Angular_distance) of the limbs of the planet from our perspective - I.E. from one side of the planet to the other. With that information, and knowing the diameter of the planet from the tables above, the problem devolves into finding a side of a right angled triangle, like so: 
+
+![Trigonometry is actually pretty useful. Sort of...][range]
+
+So we're going to use $\tan\alpha={opposite\over{adjacent}}$, rearranging it to ${adjacent={opposite\over{\tan\alpha}}}$ alpha is the angular separation we measured, and opposite is half the diameter of the planet. Easy.
+
 ### Acknowledgements
 
 ### Jet Propulsion Laboratory's Ephemeris
@@ -139,3 +149,4 @@ No link because they're currently renovating their website. I'll try to remember
 [step-3]: docs/images/step3.png
 [step-4]: docs/images/step4.png
 [step-5]: docs/images/step5.png
+[range]: docs/images/range.png

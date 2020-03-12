@@ -37,6 +37,7 @@ struct arg_flags {
     int origin;
     char * argz;
     size_t argz_len;
+    int interactive  : 1 // interactively get the details or parse from argz
 };
 
 // constants
@@ -65,7 +66,10 @@ int get_position(
                 double *, double *);
 int parse_args(int, char *, struct argp_state *);
 int parse_dt(char *, struct arg_flags *);
+int get_diameter(int, double *);
+int get_range(int, double, double *);
 
+// header functions
 int
 parse_args(int key, char * arg, struct argp_state * state)
 {

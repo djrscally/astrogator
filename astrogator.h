@@ -43,6 +43,7 @@ struct arg_flags {
 // constants
 const char * argp_program_bug_address = "https://github.com/djrscally/astrogator/issues";
 const char * argp_program_version = "astrogator "VERSION" compiled "__DATE__"\n"
+                                    "A program for aiding in astronomical navigation.\n"
                                     "Copyright (C) 2020 Dan Scally\n"
                                     "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n"
                                     "This is free software: you are free to change and redistribute it.\n"
@@ -66,7 +67,7 @@ int get_position(
                 double *, double *);
 int parse_args(int, char *, struct argp_state *);
 int parse_dt(char *, struct arg_flags *);
-int get_diameter(int, double *);
+int get_diameter(int, int *);
 int get_range(int, double, double *);
 
 // header functions

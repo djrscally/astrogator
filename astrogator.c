@@ -27,7 +27,7 @@ struct argp argp = {
     options,
     parse_args,
     "-m p -g BODY\n-m p ORIGIN BODY1 ANGLE1 BODY2 ANGLE2\n-m o -g BODY\n-m o POSITION POSITION\n-m r BODY ANGLE",
-    "\nObtain astronomical navigation data.\vSee https://github.com/djrscally/astrogator for full user guide. Positional data drawn from JPL's ephemerides."
+    "\nA program for aiding in astronomical navigation.\vSee https://github.com/djrscally/astrogator for full user guide. Positional data drawn from JPL's ephemerides."
 };
 
 int
@@ -53,6 +53,8 @@ main(int argc, char * argv[])
     // parse the arguments into our various flags
     argp_parse(&argp, argc, argv, 0, 0, &af);
 
+    // if we just run astrogator with no args, show the usage and exit.
+
     if (af.mode == 'p') {
         if (af.get_flag) {
             // We're in get known position of object mode. First up, parse datetime into
@@ -77,7 +79,7 @@ main(int argc, char * argv[])
             int result = get_position(af.type, af.body1, tjd, position, velocity);
 
             if (!result) {
-                printf("position: (%.6lf, %.6lf, %.6lf), velocity: (%.6lf, %.6lf, %.6lf)\n",
+                fprintf(stdout, "position: (%.6lf, %.6lf, %.6lf), velocity: (%.6lf, %.6lf, %.6lf)\n",
                     position[0], position[1], position[2],
                     velocity[0], velocity[1], velocity[2]
                 );
@@ -131,11 +133,16 @@ main(int argc, char * argv[])
         if (af.get_flag) {
             fprintf(stdout, "Not implemented yet");
         } else {
-            fprintf("Enter the angular separation of the limbs of the planet in degrees: ");
+            // 
+            fprintf(stdout, "Enter the angular separation of the limbs of the planet in degrees: ");
             double sep;
-            fscanf(stdin, "%d", &sep);
+            fscanf(stdin, "%lf", &sep);
             double range;
+
+            // fetch the range
             get_range(af.body1, sep, &range);
+
+            // and report!
             fprintf(stdout, "Range to body: %.6lfkm", range);
         }
     }
@@ -158,22 +165,31 @@ int get_range(int number, double sep, double * range)
 
     Return Values
         0                   = all is well
-        10+                 = something went wrong with get_diameter
+        10+                 = something went wrong with get_diameter. This function will
+                              return 10 plus the error number from get_diameter
 */
 {
     // first, get the diameter of the planet in km
-    double diameter;
+    int diameter;
     int status = get_diameter(number, &diameter);
+
+    // make sure nothing went whoopsie-do
     if (status) {
-        fprintf(stderr, "An error occurred when fetching the diameter of the planet");
+        fprintf(stderr, "An error occurred when fetching the diameter of the planet.\n");
         return 10 + status;
     }
 
     // tan of an angle is adjacent over opposite. therefore by extension
     // adjacent = opposite / tanA. The opposite is half the diameter of the planet, 
-    // and A is half the observed angular separation
+    // and A is half the observed angular separation of the planetary limbs.
 
-    *range = (0.5*diameter) / (tan(sep))
+    *range = (0.5*diameter) / (tan(0.5*sep));
+
+    // alternative:
+    // d = 2D tan(theta/2)
+    double altrange;
+    altrange = (2*diameter) * (tan(0.5*sep));
+    printf("alt range: %.6lf\n", altrange);
 
     return 0;
 }
@@ -236,7 +252,7 @@ get_position(int type, int number, double tjd, double position[3], double veloci
     ephem_close();
 
     if (ephem_result) {
-        printf("ERROR: The Ephemeris returned the following error code: %d\n", ephem_result);
+        fprintf(stderr, "ERROR: The Ephemeris returned the following error code: %d\n", ephem_result);
         // 200 defines an error returned by the ephemeris
         return ERROR_GETPOSITION + 200 + ephem_result;
     }
@@ -271,7 +287,7 @@ fix_position(double tjd, int origin, int body1, double angle1, int body2, double
     return 0; // because I'm a placeholder!
 }
 
-double
+int
 get_diameter(int body, int * diameter)
 /*
     get diameter just returns the diameter of the solar system body that's passed in
@@ -288,7 +304,7 @@ get_diameter(int body, int * diameter)
 */
 
 {
-    switch body {
+    switch (body) {
         case 1:
             // mercury
             *diameter=4879;
@@ -327,7 +343,8 @@ get_diameter(int body, int * diameter)
             break;
         case 10:
             // sol
-
+            *diameter=1391400;
+            break;
         case 11:
             // luna
             *diameter=3475;

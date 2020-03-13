@@ -15,11 +15,12 @@
 
 struct argp_option options[] = {
     {"mode", 'm', "MODE", 0, "Switch program into position/orbit/range mode."},
-    {"get", 'g', "BODY", 0, "Get data for the specified natural body rather than the user's spacecraft."},
-    {"datetime", 'd', "DATETIME", 0, "Use specified datetime (in format YYYY-m-d-HH)"},
+    {"lookup", 'l', "BODY", 0, "Lookup data for the specified natural body rather than calculate a value for a spacecraft."},
+    {"datetime", 'd', "DATETIME", 0, "Use specified datetime (in format YYYY-m-d-HH) instead of the current datetime"},
     {"position", 999, 0, 0, "Shorthand for --mode=position"},
     {"orbit", 888, 0, 0, "Shorthand for --mode=orbit"},
     {"range", 777, 0, 0, "Shorthand for --mode=range"},
+{"non-interactive", 'n', 0, 0, "Switch off interactive mode (in which case you must supply all required values as command line arguments"},
     { 0 }
 };
 
@@ -27,23 +28,24 @@ struct argp argp = {
     options,
     parse_args,
     "-m p -g BODY\n-m p ORIGIN BODY1 ANGLE1 BODY2 ANGLE2\n-m o -g BODY\n-m o POSITION POSITION\n-m r BODY ANGLE",
-    "\nA program for aiding in astronomical navigation.\vSee https://github.com/djrscally/astrogator for full user guide. Positional data drawn from JPL's ephemerides."
+    "\nA program for aiding in astronomical navigation. See https://github.com/djrscally/astrogator for full user guide."
 };
 
 int
 main(int argc, char * argv[])
 {
+    // args structure, with defaults
     struct arg_flags af = {
-        'p'
-        , 0
-        , 0
-        , 3
-        , 0
-        , 0
-        , 2020
-        , 3
-        , 7
-        , 23
+        'p' // mode
+        , 0 // get flag
+        , 0 // type
+        , 3 // body1
+        , 0 // body2
+        , 0 // custom dt flag
+        , 2020 // year
+        , 3 // month
+        , 7 // day
+        , 23 // hour
         , 10
         , NULL
         , 0
@@ -290,7 +292,9 @@ fix_position(double tjd, int origin, int body1, double angle1, int body2, double
 int
 get_diameter(int body, int * diameter)
 /*
-    get diameter just returns the diameter of the solar system body that's passed in
+    get diameter just returns the diameter of the solar system body that's passed in.
+    Stored as an array of values for both binary space savings and also because a 12
+    statement switch is just freaking ugly.
 
         Input Params
             body            = object number
@@ -298,59 +302,25 @@ get_diameter(int body, int * diameter)
         Output Params
             diameter        = the diameter in km of the body in question
 
-        Return Valuse
+        Return Values
             0               = Success!
             1               = That body doesn't exist you numpty.
 */
 
 {
-    switch (body) {
-        case 1:
-            // mercury
-            *diameter=4879;
-            break;
-        case 2:
-            // venus
-            *diameter=12104;
-            break;
-        case 3:
-            // earth
-            *diameter=12756;
-            break;
-        case 4:
-            // mars
-            *diameter=6792;
-            break;
-        case 5:
-            // jupiter
-            *diameter=142984;
-            break;
-        case 6:
-            // saturn
-            *diameter=120536;
-            break;
-        case 7:
-            // uranus
-            *diameter=51118;
-            break;
-        case 8:
-            // neptune
-            *diameter=49528;
-            break;
-        case 9:
-            // pluto
-            *diameter=2370;
-            break;
-        case 10:
-            // sol
-            *diameter=1391400;
-            break;
-        case 11:
-            // luna
-            *diameter=3475;
-            break;
-        default:
-            return 1;
+    int diameters[12] = {    
+    //  dummy       mercury     venus       earth       mars        jupiter  
+        0x0,        0x130f,     0x2f48,     0x31d4,     0x1a88,     0x22e88,
+    //  saturn      uranus      neptune     pluto       sol         luna
+        0x1d6d8,    0xc7ae,     0xc178,     0x942,      0x153b28,   0xd93
+    };
+
+    if ((body < 1) || (body > 11)) {
+        fprintf(stderr, "An invalid body number was entered.\n");
+        return 1;
+    } else {
+        *diameter = diameters[body];
     }
+
     return 0;
 }

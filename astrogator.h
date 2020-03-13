@@ -79,8 +79,11 @@ parse_args(int key, char * arg, struct argp_state * state)
     switch(key) {
         case 'm':
             af->mode=arg[0];
+            if (!((af->mode=='p') || (af->mode=='r') || (af->mode=='o'))) {
+                argp_failure(state, 1, 0, "Mode must be one of p[osition], r[ange] or o[rbit].\n");
+            }
             break;
-        case 'g':
+        case 'l':
             af->get_flag = 1;
             af->type=0;
 
@@ -102,6 +105,9 @@ parse_args(int key, char * arg, struct argp_state * state)
             if (parse_dt(arg, af)) {
                 argp_failure(state, 1, 0, "Invalid datetime entered");
             }
+        case 'n':
+            af->interactive = 0;
+            break;
         case 999:
             af->mode='p';
             break;
@@ -165,7 +171,8 @@ int
 get_body_number(char * body_name)
 {
     char * bodies[11] = {
-        "mercury", "venus", "earth","mars", "jupiter", "saturn", "uranus", "neptune", "pluto", "sun", "moon"
+        "mercury", "venus", "earth","mars", "jupiter",
+        "saturn", "uranus", "neptune", "pluto", "sun", "moon"
         };
 
     int i;

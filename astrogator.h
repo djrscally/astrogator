@@ -20,6 +20,7 @@
 #define SUCCESS             0
 #define ERROR_NOARGS        1
 #define ERROR_INVALIDMODE   2
+#define ERROR_INVALIDARGS   3
 #define ERROR_GETPOSITION   1000
 
 // structs
@@ -53,20 +54,18 @@ const char * argp_program_version = "astrogator "VERSION" compiled "__DATE__"\n"
 
 // function prototypes for header
 int get_body_number(char *);
-
-// function prototypes for source
-int fix_position(
-                // inputs
-                double, int, int, double, int, double,
-                // output
-                double *);
-int get_position(
-                // inputs
-                int, int, double,
-                // outputs
-                double *, double *);
 int parse_args(int, char *, struct argp_state *);
 int parse_dt(char *, struct arg_flags *);
+double arcsec_to_degree(double);
+double degree_to_arcsec(double);
+
+// function prototypes for source
+int fix_position(double, int, int, double, int, double,
+                // output
+                double *);
+int get_position(int, int, double,
+                // outputs
+                double *, double *);
 int get_diameter(int, int *);
 int get_range(int, double, double *);
 
@@ -105,8 +104,8 @@ parse_args(int key, char * arg, struct argp_state * state)
             if (parse_dt(arg, af)) {
                 argp_failure(state, 1, 0, "Invalid datetime entered");
             }
-        case 'n':
-            af->interactive = 0;
+        case 'i':
+            af->interactive = 1;
             break;
         case 999:
             af->mode='p';
@@ -172,7 +171,7 @@ get_body_number(char * body_name)
 {
     char * bodies[11] = {
         "mercury", "venus", "earth","mars", "jupiter",
-        "saturn", "uranus", "neptune", "pluto", "sun", "moon"
+        "saturn", "uranus", "neptune", "pluto", "sol", "terra"
         };
 
     int i;
@@ -185,4 +184,16 @@ get_body_number(char * body_name)
 
     // body name not matched.
     return 0;
+}
+
+double
+arcsec_to_degree(double arcsec)
+{
+    return arcsec / 3600.0;
+}
+
+double
+degree_to_arcsec(double degree)
+{
+    return degree * 3600.;
 }

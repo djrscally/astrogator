@@ -16,11 +16,11 @@
 struct argp_option options[] = {
     {"mode", 'm', "MODE", 0, "Switch program into position/orbit/range mode."},
     {"lookup", 'l', "BODY", 0, "Lookup data for the specified natural body rather than calculate a value for a spacecraft."},
-    {"datetime", 'd', "DATETIME", 0, "Use specified datetime (in format YYYY-m-d-HH) instead of the current datetime"},
+    {"datetime", 'd', "DATETIME", 0, "Use specified datetime (in format YYYY-m-d-H) instead of the current datetime"},
     {"position", 999, 0, 0, "Shorthand for --mode=position"},
     {"orbit", 888, 0, 0, "Shorthand for --mode=orbit"},
     {"range", 777, 0, 0, "Shorthand for --mode=range"},
-{"non-interactive", 'n', 0, 0, "Switch off interactive mode (in which case you must supply all required values as command line arguments"},
+    {"interactive", 'i', 0, 0, "Enable interactive mode (in which case you will be prompted for input, so do not supply command line args)"},
     { 0 }
 };
 
@@ -46,16 +46,20 @@ main(int argc, char * argv[])
         , 3 // month
         , 7 // day
         , 23 // hour
-        , 10
-        , NULL
-        , 0
-        , 1
+        , 10 // origin
+        , NULL // argz *
+        , 0 // argz_len
+        , 0 // interactive mode
     };
 
     // parse the arguments into our various flags
     argp_parse(&argp, argc, argv, 0, 0, &af);
 
-    // if we just run astrogator with no args, show the usage and exit.
+    // if we just run astrogator with no args, show the version and exit.
+    if (argc == 1) {
+        fprintf(stdout, argp_program_version);
+        return SUCCESS;
+    }
 
     if (af.mode == 'p') {
         if (af.get_flag) {
@@ -66,7 +70,6 @@ main(int argc, char * argv[])
             // did we pass a specific datetime?
             if (af.custom_dt) {
                 tjd = julian_date(af.dt_year, af.dt_month, af.dt_day, af.dt_hour);
-                printf("%.6lf", tjd);
             } else { // you presumably want the current position
                 time_t t = time(NULL);
                 struct tm tm = *localtime(&t);
@@ -133,19 +136,48 @@ main(int argc, char * argv[])
         return SUCCESS;
     } else if (af.mode == 'r') {
         if (af.get_flag) {
-            fprintf(stdout, "Not implemented yet");
+            fprintf(stdout, "Lookups in range mode not implemented yet.\n");
         } else {
-            // 
-            fprintf(stdout, "Enter the angular separation of the limbs of the planet in degrees: ");
-            double sep;
-            fscanf(stdin, "%lf", &sep);
-            double range;
+            if (af.interactive) {
 
-            // fetch the range
-            get_range(af.body1, sep, &range);
+                // prompt for the body to measure range against
+                char body_input[16];
+                fprintf(stdout, "Enter the name or number of the body you wish to measure distance to: ");
+                fscanf(stdin, "%s", &body_input);
 
-            // and report!
-            fprintf(stdout, "Range to body: %.6lfkm", range);
+                // stick it into the args struct
+                if (atoi(body_input) == 0) {
+                    af.body1 = get_body_number(body_input);
+                } else {
+                    af.body1 = atoi(body_input);
+                }
+
+                // and double check it's not nonsense
+                if ((af.body1 < 1) || (af.body1 > 11)) {
+                    fprintf(stderr, "The body entered was invalid. Please refer to the user guide");
+                    return ERROR_INVALIDARGS;
+                } 
+
+                // prompt for the separation
+                fprintf(stdout, "Enter the angular separation of the limbs of the planet in degrees: ");
+                double sep;
+                fscanf(stdin, "%lf", &sep);
+
+                // and make sure it's not nonsense
+                if ((sep <= 0.) || (sep >= 180.)) {
+                    fprintf(stderr, "Angular separation must be > 0.0 and < 180.");
+                    return ERROR_INVALIDARGS;
+                }
+
+                // fetch the range
+                double range;
+                get_range(af.body1, sep, &range);
+
+                // and report!
+                fprintf(stdout, "Range to body: %.6lfkm", range);
+            } else {
+                fprintf(stderr, "Non-interactive range mode not implemented yet.\n");
+            }
         }
     }
 }
